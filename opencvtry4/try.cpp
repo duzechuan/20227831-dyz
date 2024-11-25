@@ -12,8 +12,8 @@ int main() {
     s2 = "C:\\Users\\dw-42\\Desktop\\color-main\\color-main\\video\\move_green.avi";
     s3 = "C:\\Users\\dw-42\\Desktop\\color-main\\color-main\\video\\random.avi";
     s4 = "C:\\Users\\dw-42\\Desktop\\color-main\\color-main\\video\\move_red_yellow.avi";
-    VideoCapture cap(0); // 0表示默认的摄像头，若有多个摄像头可以使用1、2等其他索引
-    //VideoCapture cap(s3);
+    //VideoCapture cap(0); // 0表示默认的摄像头，若有多个摄像头可以使用1、2等其他索引
+    VideoCapture cap(s3);
     if (!cap.isOpened()) {
         cout << "Error: Could not open video!" << endl;
         return -1;
@@ -56,20 +56,24 @@ int main() {
         int green_area = countNonZero(mask_green);
         int yellow_area = countNonZero(mask_yellow);
 
-        string status;
+        string status,status2=" ";
 
-        // 判断信号灯的状态，并设置状态文本
-        if (yellow_area > 400) {
-            status = "YELLOW";
+        // 判断信号灯的状态，并设置状态文本为颜色区域最大面积对应的颜色
+        int max_area = max({ red_area, green_area,yellow_area });
+        if (max_area == red_area) {
+            status = "RED";
         }
-        else if (green_area > red_area && green_area > yellow_area) {
+        else if (max_area == green_area) {
             status = "GREEN";
         }
-        else if (red_area > green_area && red_area > yellow_area) {
-            status = "RED";
+        else if (max_area == yellow_area) {
+            status = "YELLOW";
         }
         else {
             status = "NOT";
+        }
+        if (yellow_area > 400) {
+            status2 = "YELLOW OR TOOCLOSE";
         }
 
         // 查找红色区域的轮廓并绘制矩形框
@@ -121,7 +125,7 @@ int main() {
         }
 
         // 在左上角显示状态，使用蓝色字体
-        putText(frame, status, Point(50, 50), FONT_HERSHEY_SIMPLEX, 1, Scalar(255, 0, 0), 2);
+        putText(frame, status+status2, Point(50, 50), FONT_HERSHEY_SIMPLEX, 1, Scalar(255, 0, 0), 2);
 
         // 显示处理后的图像
         imshow("Traffic Light Detection", frame);
